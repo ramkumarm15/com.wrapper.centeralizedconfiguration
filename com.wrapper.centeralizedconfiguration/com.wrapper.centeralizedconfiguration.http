@@ -1,0 +1,6 @@
+@com.wrapper.centeralizedconfiguration_HostAddress = http://localhost:5269
+
+GET {{com.wrapper.centeralizedconfiguration_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
