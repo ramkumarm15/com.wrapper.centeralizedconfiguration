@@ -20,7 +20,7 @@ builder.Configuration.AddAzureAppConfiguration(opt =>
        .ConfigureRefresh(refOpt =>
        {
            refOpt.Register("Testing:Settings:Refresh", refreshAll: true);
-           refOpt.SetRefreshInterval(TimeSpan.FromSeconds(60));
+           refOpt.SetRefreshInterval(TimeSpan.FromSeconds(5));
        });
     builder.Services.AddSingleton(opt.GetRefresher());
 

@@ -81,15 +81,19 @@ namespace com.wrapper.centeralizedconfiguration.Controllers
                     if (eventData is AppConfigurationKeyValueModifiedEventData appConfigurationKeyValueModifiedEventData)
                     {
                         logger.LogInformation($"Updating config data...");
-                        eventGridEvent.TryCreatePushNotification(out PushNotification pushNotification);
-
-                        foreach (var refresh in provider.Refreshers)
+                        if (eventGridEvent.TryCreatePushNotification(out PushNotification pushNotification))
                         {
-                            refresh.ProcessPushNotification(pushNotification);
-                            var result = await refresh.TryRefreshAsync();
-                            if (result)
+
+                            foreach (var refresh in provider.Refreshers)
                             {
-                                logger.LogInformation("Configuration updated..");
+                                refresh.ProcessPushNotification(pushNotification);
+
+                                var result = await refresh.TryRefreshAsync();
+                                if (result)
+                                {
+                                    logger.LogInformation("Configuration updated..");
+                                    return Ok(result);
+                                }
                             }
                         }
                     }
