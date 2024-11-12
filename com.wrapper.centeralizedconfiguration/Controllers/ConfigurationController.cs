@@ -86,7 +86,7 @@ namespace com.wrapper.centeralizedconfiguration.Controllers
 
                             foreach (var refresh in provider.Refreshers)
                             {
-                                refresh.ProcessPushNotification(pushNotification);
+                                //refresh.ProcessPushNotification(pushNotification);
 
                                 var result = await refresh.TryRefreshAsync();
                                 if (result)
