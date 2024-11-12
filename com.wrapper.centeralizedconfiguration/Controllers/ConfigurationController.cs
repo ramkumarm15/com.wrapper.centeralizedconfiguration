@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid.SystemEvents;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration.Extensions;
+using System.Text.Json;
 
 namespace com.wrapper.centeralizedconfiguration.Controllers
 {
@@ -28,6 +32,7 @@ namespace com.wrapper.centeralizedconfiguration.Controllers
             if (section.Exists())
             {
                 result = Helper.GetSubSectionConfigs(section, prefix);
+                logger.LogInformation(JsonSerializer.Serialize(result));
             }
             else
             {
@@ -40,12 +45,56 @@ namespace com.wrapper.centeralizedconfiguration.Controllers
         [HttpGet("Refresh")]
         public async Task<IActionResult> Refresh()
         {
+
             logger.LogInformation("Refresh method started");
             foreach (var refresh in provider.Refreshers)
             {
                 return Ok(await refresh.TryRefreshAsync());
             }
             return BadRequest();
+        }
+
+
+        [HttpPost("EventGridAsync")]
+        public async Task<IActionResult> EventGridAsync()
+        {
+            var events = await BinaryData.FromStreamAsync(Request.Body);
+
+            EventGridEvent[] eventGridEvents = EventGridEvent.ParseMany(events);
+
+            logger.LogInformation("data: " + JsonSerializer.Serialize(eventGridEvents));
+
+            foreach (var eventGridEvent in eventGridEvents)
+            {
+                if (eventGridEvent.TryGetSystemEventData(out var eventData))
+                {
+                    if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
+                    {
+                        var responseData = new SubscriptionValidationResponse()
+                        {
+                            ValidationResponse = subscriptionValidationEventData.ValidationCode
+                        };
+                        return Ok(responseData);
+                    }
+                    if (eventData is AppConfigurationKeyValueModifiedEventData appConfigurationKeyValueModifiedEventData)
+                    {
+                        logger.LogInformation($"Updating config data...");
+                        eventGridEvent.TryCreatePushNotification(out PushNotification pushNotification);
+
+                        foreach (var refresh in provider.Refreshers)
+                        {
+                            refresh.ProcessPushNotification(pushNotification);
+                            var result = await refresh.TryRefreshAsync();
+                            if (result)
+                            {
+                                logger.LogInformation("Configuration updated..");
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Ok();
         }
     }
 }
