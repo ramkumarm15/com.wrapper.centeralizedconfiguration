@@ -70,10 +70,12 @@ namespace com.wrapper.centeralizedconfiguration.Controllers
                 {
                     if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
                     {
+                        logger.LogInformation("SubscriptionValidationEventData triggered");
                         var responseData = new SubscriptionValidationResponse()
                         {
                             ValidationResponse = subscriptionValidationEventData.ValidationCode
                         };
+                        logger.LogInformation(JsonSerializer.Serialize(responseData));
                         return Ok(responseData);
                     }
                     if (eventData is AppConfigurationKeyValueModifiedEventData appConfigurationKeyValueModifiedEventData)
