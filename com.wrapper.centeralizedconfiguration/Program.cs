@@ -24,10 +24,10 @@ builder.Configuration.AddAzureAppConfiguration(opt =>
         ManagedIdentityClientId = "37c94fdf-9c81-4f80-ab91-e9a16b459e6c"
     });
     opt.Connect(new Uri("https://pocappconfig.azconfig.io"), cred)
-       .Select("Testing:*", null)
+       .Select("Settings:*", null)
        .ConfigureRefresh(refOpt =>
        {
-           refOpt.Register("Testing:Settings:Refresh", refreshAll: true);
+           refOpt.Register("Settings:Refresh", refreshAll: true);
            refOpt.SetRefreshInterval(TimeSpan.FromSeconds(60));
        });
     builder.Services.AddSingleton(opt.GetRefresher());
