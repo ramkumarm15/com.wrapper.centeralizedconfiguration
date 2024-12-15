@@ -23,7 +23,7 @@ builder.Configuration.AddAzureAppConfiguration(opt =>
     {
         ManagedIdentityClientId = "d3cf4842-b720-46f9-a3f0-f57f78a8cefc"
     });
-    opt.Connect(new Uri("https://pocappconfig.azconfig.io"), cred)
+    opt.Connect(new Uri("https://app-configuration-practice.azconfig.io"), cred)
        .Select("Settings:*", null)
        .ConfigureRefresh(refOpt =>
        {
