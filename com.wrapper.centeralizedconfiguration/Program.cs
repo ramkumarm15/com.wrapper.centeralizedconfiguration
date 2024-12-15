@@ -21,7 +21,7 @@ builder.Configuration.AddAzureAppConfiguration(opt =>
 {
     var cred = new DefaultAzureCredential(new DefaultAzureCredentialOptions()
     {
-        ManagedIdentityClientId = "37c94fdf-9c81-4f80-ab91-e9a16b459e6c"
+        ManagedIdentityClientId = "d3cf4842-b720-46f9-a3f0-f57f78a8cefc"
     });
     opt.Connect(new Uri("https://pocappconfig.azconfig.io"), cred)
        .Select("Settings:*", null)
